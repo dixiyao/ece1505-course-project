@@ -111,7 +111,6 @@ class LogProgressCallback(ServerCallback):
                 accuracy_row = [
                     server.current_round,
                     update.client_id,
-                    update.report.accuracy,
                     update.report.gbound,
                     update.report.training_time + update.report.comm_time,
                     update.report.num_samples,

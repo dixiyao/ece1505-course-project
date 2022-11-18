@@ -68,21 +68,19 @@ class Server(fedavg.Server):
                 )
 
         # Initialize the test accuracy csv file if clients compute locally
-        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
-            accuracy_csv_file = (
-                f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
-            )
-            accuracy_headers = [
-                "round",
-                "client_id",
-                "accuracy",
-                "roundtime",
-                "gbound",
-                "samples",
-            ]
-            csv_processor.initialize_csv(
-                accuracy_csv_file, accuracy_headers, Config().params["result_path"]
-            )
+        accuracy_csv_file = (
+            f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
+        )
+        accuracy_headers = [
+            "round",
+            "client_id",
+            "roundtime",
+            "gbound",
+            "samples",
+        ]
+        csv_processor.initialize_csv(
+            accuracy_csv_file, accuracy_headers, Config().params["result_path"]
+        )
 
     def load_probability(self):
         """Load the probability"""
