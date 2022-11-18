@@ -6,7 +6,7 @@ clients:
     total_clients: 3597
 
     # The number of clients selected in each round
-    per_round: 180
+    per_round: 700
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -14,12 +14,12 @@ clients:
     commu_simulation: true
     compute_comm_time: true
 
-    speed_simulation: true
-    max_sleep_time: 3
-    simulation_distribution: 
-        distribution: normal
-        mean: 1
-        sd: 0.5
+    #speed_simulation: true
+    #max_sleep_time: 3
+    #simulation_distribution: 
+    #    distribution: normal
+    #    mean: 1
+    #    sd: 0.5
 
     sample: uniform
 
@@ -46,7 +46,7 @@ trainer:
     rounds: 50
 
     # The maximum number of clients running concurrently
-    max_concurrency: 30
+    max_concurrency: 10
 
     # The target accuracy
     target_accuracy: 0.95

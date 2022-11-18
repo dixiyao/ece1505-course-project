@@ -101,21 +101,19 @@ class LogProgressCallback(ServerCallback):
         result_csv_file = f"{Config().params['result_path']}/{os.getpid()}.csv"
         csv_processor.write_csv(result_csv_file, new_row)
 
-        if hasattr(Config().clients, "do_test") and Config().clients.do_test:
-            # Updates the log for client test accuracies
-            accuracy_csv_file = (
-                f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
-            )
+        accuracy_csv_file = (
+            f"{Config().params['result_path']}/{os.getpid()}_accuracy.csv"
+        )
 
-            for update in server.updates:
-                accuracy_row = [
-                    server.current_round,
-                    update.client_id,
-                    update.report.gbound,
-                    update.report.training_time + update.report.comm_time,
-                    update.report.num_samples,
-                ]
-                csv_processor.write_csv(accuracy_csv_file, accuracy_row)
+        for update in server.updates:
+            accuracy_row = [
+                server.current_round,
+                update.client_id,
+                update.report.gbound,
+                update.report.training_time + update.report.comm_time,
+                update.report.num_samples,
+            ]
+        csv_processor.write_csv(accuracy_csv_file, accuracy_row)
 
         logging.info("[%s] All client reports have been processed.", server)
 
