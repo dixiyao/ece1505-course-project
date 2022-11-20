@@ -74,8 +74,8 @@ class Server(fedavg.Server):
         accuracy_headers = [
             "round",
             "client_id",
-            "roundtime",
             "gbound",
+            "round_time",
             "samples",
         ]
         csv_processor.initialize_csv(

@@ -3,16 +3,14 @@ import torch
 
 from plato.trainers import basic
 
-
 class Trainer(basic.Trainer):
     """Log down G_i"""
 
     def __init__(self, model=None, callbacks=None):
         super().__init__(model, callbacks)
-        self.gbound = None
+        self.gbound = 0
 
     def perform_forward_and_backward_passes(self, config, examples, labels):
-        gbound = 0
         self.optimizer.zero_grad()
 
         outputs = self.model(examples)
@@ -26,10 +24,9 @@ class Trainer(basic.Trainer):
             loss.backward()
 
         for param in self.model.parameters():
-            grad = torch.norm(param.grad, p=2)
-            gbound = max(gbound, grad.item())
+            grad = torch.abs(torch.norm(param.grad, p=2))
+            self.gbound = max(self.gbound, grad.item())
 
-        self.gbound = gbound
         self.optimizer.step()
 
         return loss
