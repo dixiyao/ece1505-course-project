@@ -146,8 +146,6 @@ logs/
 checkpoints/
 *.pth
 
-# Result files
-results/
 
 # macOS
 .DS_Store
