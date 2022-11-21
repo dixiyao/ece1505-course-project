@@ -6,7 +6,7 @@ clients:
     total_clients: 3597
 
     # The number of clients selected in each round
-    per_round: 10
+    per_round: 5
 
     # Should the clients compute test accuracy locally?
     do_test: false
@@ -46,10 +46,10 @@ trainer:
     rounds: 1000
 
     # The maximum number of clients running concurrently
-    #max_concurrency: 10
+    #max_concurrency: 3
 
     # The target accuracy
-    target_accuracy: 0.95
+    target_accuracy: 0.7
 
     # The machine learning model
     model_name: lenet5

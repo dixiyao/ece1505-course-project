@@ -3,6 +3,9 @@ import os
 import logging
 import random
 import numpy as np
+import pandas as pd
+import time
+import heapq
 
 from plato.utils import csv_processor
 
@@ -84,15 +87,21 @@ class Server(fedavg.Server):
 
     def load_probability(self):
         """Load the probability"""
+        prob = (
+                np.zeros(Config().clients.total_clients)
+            )
         # uniform
         if Config().clients.sample == "uniform":
-            prob = (
-                np.ones(Config().clients.total_clients) / Config().clients.total_clients
-            )
-        return prob
 
+            for i in range(100):
+                prob[i]=0.01
+        if Config().clients.sample == "pi":
+            prob_f=pd.read_csv('/home/dixi/plato-FedNAS/examples/fedavg/fedavg_p.csv')
+            for i in range(100):
+                prob[i]=prob_f['p'][i]
+        return prob
+    
     def choose_clients(self, clients_pool, clients_count):
-        """Chooses a subset of the clients to participate in each round."""
         assert clients_count <= len(clients_pool)
         random.setstate(self.prng_state)
 
@@ -106,3 +115,71 @@ class Server(fedavg.Server):
         self.prng_state = random.getstate()
         logging.info("[%s] Selected clients: %s", self, selected_clients)
         return selected_clients
+        
+    async def process_client_info(self, client_id, sid):
+        """Processes the received metadata information from a reporting client."""
+        # First pass through the inbound_processor(s), if any
+        self.client_payload[sid] = self.inbound_processor.process(
+            self.client_payload[sid]
+        )
+
+        if self.comm_simulation:
+            if (
+                hasattr(Config().clients, "compute_comm_time")
+                and Config().clients.compute_comm_time
+            ):
+                self.reports[sid].comm_time = (
+                    self.downlink_comm_time[client_id]
+                    + self.uplink_comm_time[client_id]
+                )
+            else:
+                self.reports[sid].comm_time = 0
+        else:
+            self.reports[sid].comm_time = time.time() - self.reports[sid].comm_time
+
+        if hasattr(self.reports[sid], "client_id"):
+            # When the client is responding to an urgent request for an update, it will
+            # store its client ID in its report
+            client_id = self.reports[sid].client_id
+
+        try:
+            start_time = self.training_clients[client_id]["start_time"]
+        except:
+            start_time = time.time()
+        finish_time = (
+            self.reports[sid].training_time + self.reports[sid].comm_time + start_time
+        )
+        
+        try:
+            starting_round = self.training_clients[client_id]["starting_round"]
+        except:
+            starting_round = 1
+
+        if Config().is_central_server():
+            self.comm_overhead += self.reports[sid].edge_server_comm_overhead
+
+        client_info = (
+            finish_time,  # sorted by the client's finish time
+            client_id,  # in case two or more clients have the same finish time
+            {
+                "client_id": client_id,
+                "sid": sid,
+                "starting_round": starting_round,
+                "start_time": start_time,
+                "report": self.reports[sid],
+                "payload": self.client_payload[sid],
+            },
+        )
+
+        heapq.heappush(self.reported_clients, client_info)
+        self.current_reported_clients[client_info[2]["client_id"]] = True
+        try:
+            del self.training_clients[client_id]
+        except:
+            pass
+
+        if self.asynchronous_mode and self.simulate_wall_time:
+            self.training_sids.remove(client_info[2]["sid"])
+
+        await self._process_clients(client_info)
+   
