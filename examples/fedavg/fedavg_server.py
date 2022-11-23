@@ -99,6 +99,14 @@ class Server(fedavg.Server):
             prob_f=pd.read_csv('/home/dixi/plato-FedNAS/examples/fedavg/fedavg_p.csv')
             for i in range(100):
                 prob[i]=prob_f['p'][i]
+        if Config().clients.sample == "a1":
+            prob_f=pd.read_csv('/home/dixi/plato-FedNAS/examples/fedavg/qwhenalpha1.csv')
+            for i in range(100):
+                prob[i]=prob_f['p'][i]
+        if Config().clients.sample == "a2":
+            prob_f=pd.read_csv('/home/dixi/plato-FedNAS/examples/fedavg/qwhenalpha0000026.csv')
+            for i in range(100):
+                prob[i]=prob_f['p'][i]
         return prob
     
     def choose_clients(self, clients_pool, clients_count):
