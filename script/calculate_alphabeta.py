@@ -8,8 +8,8 @@ sump2G2 = np.sum(p * p * G * G)
 sumpG2 = np.sum(p * G * G)
 print(sump2G2, sumpG2)
 
-R1 = 23
-R2 = 22
+R1 = 210
+R2 = 134
 
 result = (R1 / R2 - 1) / (100 * sump2G2 - R1 / R2 * sumpG2)
 print(result)
